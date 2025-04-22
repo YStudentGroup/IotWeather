@@ -5,10 +5,10 @@ Installation de python
 	2. Clique sur Download Python (la dernière version stable).
 
 ⚙️ Lancer l’installateur
-	1.	Exécuter le fichier téléchargé.
-	2.	Cocher la case “Add Python to PATH” en bas avant de cliquer sur “Install Now”.
-	3.	Cliquer sur “Install Now”.
-	4.	Laisser l’installation se faire. À la fin, clique sur “Close”.
+	1. Exécuter le fichier téléchargé.
+	2. Cocher la case “Add Python to PATH” en bas avant de cliquer sur “Install Now”.
+	3. Cliquer sur “Install Now”.
+	4. Laisser l’installation se faire. À la fin, clique sur “Close”.
 
  Installation du package
  
