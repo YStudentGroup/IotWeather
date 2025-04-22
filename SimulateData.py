@@ -12,6 +12,23 @@ def get_weather():
         'automne': (5, 15)
     }
 
+    locationList = [
+        'Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice',
+        'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille',
+        'Rennes', 'Reims', 'Saint-Étienne', 'Le Havre', 'Grenoble',
+        'Dijon', 'Nîmes', 'Aix-en-Provence', 'Angers', 'Villeurbanne',
+        'Saint-Denis', 'Clermont-Ferrand', 'La Rochelle', 'Saint-Paul',
+        'Saint-Pierre', 'Amiens', 'Tours', 'Limoges', 'Annecy',
+        'Perpignan', 'Metz', 'Besançon', 'Boulogne-Billancourt',
+        'Rouen', 'Mulhouse', 'Caen', 'Nancy', 'Argenteuil',
+        'Saint-Maur-des-Fossés', 'Montreuil', 'Avignon', 'Nanterre',
+        'Créteil', 'Poitiers', 'Versailles', 'La Seyne-sur-Mer',
+        'Colombes', 'Asnières-sur-Seine', 'Aubervilliers', 'Rueil-Malmaison',
+        'Antibes', 'Saint-Nazaire', 'Cannes', 'Saint-Denis', 'Colmar',
+        'La Rochelle', 'Calais', 'Ajaccio', 'Béziers', 'Cayenne',
+        'Fort-de-France', 'Pau', 'Saint-Étienne-du-Rouvray', 'Le Tampon',
+    ]
+
     month = datetime.now().month
     if month in [12, 1, 2]:
         saison = 'hiver'
@@ -28,6 +45,7 @@ def get_weather():
     temp_min, temp_max = temperatures[saison]
     temperature = round(random.uniform(temp_min, temp_max), 1)
     ressentie = round(random.uniform(temperature - 3, temperature + 3), 1)
+    location = random.choice(locationList)
     
     condition = random.choice(conditions)
 
@@ -38,6 +56,7 @@ def get_weather():
         'season': saison,
         'wind': vent,
         'humidity': humidite,
+        'location': location,
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
@@ -48,13 +67,14 @@ def send_weather_to_api(api_url):
         try:
             response = requests.post(api_url, json=data)
             if response.status_code >= 200 and response.status_code < 300:
+                print(data)
                 print(f"[{datetime.now()}] Données envoyées avec succès.")
             else:
                 print(f"[{datetime.now()}] Erreur {response.status_code} lors de l'envoi.")
         except Exception as e:
             print(f"[{datetime.now()}] Exception lors de l'envoi : {e}")
 
-        time.sleep(60)
+        time.sleep(10)
 
 if __name__ == "__main__":
     API_URL = "http://192.168.137.1:3001/api/weather"
