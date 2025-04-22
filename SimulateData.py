@@ -3,6 +3,7 @@ from datetime import datetime
 import time
 import requests # type: ignore
 
+weather_cache = {}
 def get_weather():
     conditions = ['ensoleillé', 'nuageux', 'pluvieux', 'orageux', 'neigeux',]
     temperatures = {
@@ -40,25 +41,44 @@ def get_weather():
         saison = 'automne'
 
     vent_min, vent_max = (0, 80)
-    vent = round(random.uniform(vent_min, vent_max), 1)
-    humidite = round(random.uniform(0, 100), 1)
-    temp_min, temp_max = temperatures[saison]
-    temperature = round(random.uniform(temp_min, temp_max), 1)
-    ressentie = round(random.uniform(temperature - 3, temperature + 3), 1)
+    now = datetime.now()
     location = random.choice(locationList)
-    
-    condition = random.choice(conditions)
 
-    return {
+    if location not in weather_cache:
+        weather_cache[location] = {}
+    cached = weather_cache[location]
+    if 'data' in cached:
+        prev_data = cached['data']
+        temperature = round(prev_data['temperature'] + random.uniform(-1.0, 1.0), 1)
+        ressentie = round(temperature + random.uniform(-2.0, 2.0), 1)
+        vent = round(prev_data['wind'] + random.uniform(-2.0, 2.0), 1)
+        humidite = round(prev_data['humidity'] + random.uniform(-3.0, 3.0), 1)
+        condition = prev_data['condition'] if random.random() < 0.8 else random.choice(conditions)
+    else:
+        condition = random.choice(conditions)
+        vent = round(random.uniform(vent_min, vent_max), 1)
+        humidite = round(random.uniform(0, 100), 1)
+        temp_min, temp_max = temperatures[saison]
+        temperature = round(random.uniform(temp_min, temp_max), 1)
+        ressentie = round(random.uniform(temperature - 3, temperature + 3), 1)
+
+    data = {
         'temperature': temperature,
         'felt': ressentie,
         'condition': condition,
         'season': saison,
-        'wind': vent,
-        'humidity': humidite,
+        'wind': max(0, min(vent, 150)),
+        'humidity': max(0, min(humidite, 100)),
         'location': location,
-        'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        'date': datetime.utcnow().isoformat() + "Z"
     }
+
+    weather_cache[location] = {
+        'data': data,
+        'timestamp': now
+    }
+
+    return data
 
 
 def send_weather_to_api(api_url):
