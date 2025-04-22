@@ -57,5 +57,5 @@ def send_weather_to_api(api_url):
         time.sleep(60)
 
 if __name__ == "__main__":
-    API_URL = "http://localhost:8000/api/meteo/"
+    API_URL = "http://192.168.137.1:3000/api/weather"
     send_weather_to_api(API_URL)
