@@ -11,6 +11,7 @@ Installation de python
 	4.	Laisser l’installation se faire. À la fin, clique sur “Close”.
 
  Installation du package
+ 
  Depuis le dossier du projet
   1. python -m venv venv
   2. source venv/bin/activate
@@ -18,5 +19,6 @@ Installation de python
 
 
 Lancement de l'application
+
 Depuis le dossier du projet
 python SimulateData.py
