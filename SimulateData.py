@@ -47,7 +47,7 @@ def send_weather_to_api(api_url):
         data = get_weather()
         try:
             response = requests.post(api_url, json=data)
-            if response.status_code == 200:
+            if response.status_code >= 200 and response.status_code < 300:
                 print(f"[{datetime.now()}] Données envoyées avec succès.")
             else:
                 print(f"[{datetime.now()}] Erreur {response.status_code} lors de l'envoi.")
@@ -57,5 +57,5 @@ def send_weather_to_api(api_url):
         time.sleep(60)
 
 if __name__ == "__main__":
-    API_URL = "http://192.168.137.1:3000/api/weather"
+    API_URL = "http://192.168.137.1:3001/api/weather"
     send_weather_to_api(API_URL)
