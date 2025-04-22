@@ -15,3 +15,8 @@ Installation de python
   1. python -m venv venv
   2. source venv/bin/activate
   3. pip install requests
+
+
+Lancement de l'application
+Depuis le dossier du projet
+python SimulateData.py
