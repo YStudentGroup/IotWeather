@@ -1,5 +1,7 @@
 import random
 from datetime import datetime
+import time
+import requests # type: ignore
 
 def get_weather():
     conditions = ['ensoleillé', 'nuageux', 'pluvieux', 'orageux', 'neigeux',]
@@ -30,15 +32,30 @@ def get_weather():
     condition = random.choice(conditions)
 
     return {
-        'temperature': f"{temperature}°C",
-        'felt': f"{ressentie}°C",
+        'temperature': temperature,
+        'felt': ressentie,
         'condition': condition,
         'season': saison,
-        'wind': f"{vent} km/h",
-        'humidity': f"{humidite}%",
+        'wind': vent,
+        'humidity': humidite,
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
+
+def send_weather_to_api(api_url):
+    while True:
+        data = get_weather()
+        try:
+            response = requests.post(api_url, json=data)
+            if response.status_code == 200:
+                print(f"[{datetime.now()}] Données envoyées avec succès.")
+            else:
+                print(f"[{datetime.now()}] Erreur {response.status_code} lors de l'envoi.")
+        except Exception as e:
+            print(f"[{datetime.now()}] Exception lors de l'envoi : {e}")
+
+        time.sleep(60)
+
 if __name__ == "__main__":
-    weather_data = get_weather()
-    print("Données météorologiques simulées : ", weather_data)
+    API_URL = "http://localhost:8000/api/meteo/"
+    send_weather_to_api(API_URL)
