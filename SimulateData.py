@@ -31,11 +31,11 @@ def get_weather():
 
     return {
         'temperature': f"{temperature}°C",
-        'ressentie': f"{ressentie}°C",
+        'felt': f"{ressentie}°C",
         'condition': condition,
-        'saison': saison,
-        'vent': f"{vent} km/h",
-        'humidite': f"{humidite}%",
+        'season': saison,
+        'wind': f"{vent} km/h",
+        'humidity': f"{humidite}%",
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
