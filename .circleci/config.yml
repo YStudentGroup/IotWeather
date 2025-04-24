@@ -18,7 +18,7 @@ jobs:
           command: |
             . venv/bin/activate
             pip install pylint
-            pylint your_project_directory  # Remplace par ton répertoire de code
+            pylint IotWeather  # Remplace par ton répertoire de code
       - run:
           name: Exécuter les tests avec pytest
           command: |
