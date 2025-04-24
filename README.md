@@ -15,9 +15,11 @@ Installation de python
   1. python -m venv venv  
   2. source venv/bin/activate  
   3. pip install requests  
+  5. pip install pylint
 
+Test de pylint  
+pylint --ignore=venv, ect
 
-Lancement de l'application
-
+Lancement de l'application  
 Depuis le dossier du projet  
 python SimulateData.py
