@@ -1,0 +1,52 @@
+stages:
+  - lint
+  - test
+  - deploy
+  - changelog
+  - status
+
+# Job de linter (pylint)
+lint:
+  stage: lint
+  image: python:3.9
+  script:
+    - pip install pylint
+    - pylint your_project_directory 
+  allow_failure: false  
+
+# Job pour exécuter les tests
+test:
+  stage: test
+  image: python:3.9
+  script:
+    - pip install -r requirements.txt
+    - pytest --maxfail=1 --disable-warnings -q  # Limiter à 1 échec, désactiver les avertissements
+  allow_failure: false  
+
+# Job pour générer le changelog
+changelog:S
+  stage: changelog
+  only:S
+    - main  # Le changelog sera généré uniquement sur les pushs sur la branche main
+  script:
+    - pip install standard-version  # Tu peux installer un générateur de changelog comme standard-version si nécessaire
+    - standard-version --first-release  # Générer le changelog lors du premier commit ou de la release
+    - git commit -m "chore(release): $CI_COMMIT_REF_NAME"
+    - git push origin main  # Pousser les changements sur la branche main, incluant le changelog
+
+# Job pour déployer le code (si nécessaire)
+deploy:
+  stage: deploy
+  script:
+    - echo "Déploiement IoT en cours..."
+    # Ajoute ici des étapes spécifiques à ton déploiement IoT (par exemple, envoyer le code à un appareil ou une plateforme)
+  only:
+    - main  # Le déploiement se fait uniquement sur la branche main
+
+# Job pour afficher le badge de statut du workflow
+status:
+  stage: status
+  script:
+    - echo "Status badge URL: https://img.shields.io/gitlab/pipeline/${CI_PROJECT_PATH}/latest"
+  only:
+    - main  # Affichage du badge uniquement sur la branche main
