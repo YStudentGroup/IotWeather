@@ -13,23 +13,6 @@ provider "azurerm" {
   features = {}
 }
 
-# Variables (à adapter selon ton besoin)
-variable "resource_group_name" {
-  default = "Seb-RG"
-}
-
-variable "location" {
-  default = "France Central"
-}
-
-variable "admin_username" {
-  default = "fabio.maratea@ynov.com"
-}
-
-variable "ssh_public_key_path" {
-  default = "~/.ssh/id_rsa.pub"
-}
-
 # Lecture de la clé SSH publique
 data "local_file" "ssh_key" {
   filename = var.ssh_public_key_path
