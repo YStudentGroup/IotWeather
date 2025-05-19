@@ -12,8 +12,3 @@ provider "azurerm" {
   features {}
 }
 
-variable "backend_access_key" {
-  description = "Clé d'accès au Storage Account pour le backend"
-  type        = string
-  sensitive   = true
-}
