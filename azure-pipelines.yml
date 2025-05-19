@@ -8,4 +8,4 @@ jobs:
       terraform init
       terraform apply -auto-approve
     displayName: 'Apply Terraform'
-    workingDirectory: $(System.DefaultWorkingDirectory)
+    workingDirectory: $(System.DefaultWorkingDirectory)/terraform
