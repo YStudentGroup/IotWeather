@@ -3,7 +3,7 @@ variable "admin_username" {
 }
 
 variable "ssh_public_key_path" {
-  default = "~/.ssh/id_rsa.pub"
+  default = "C:\Users\User\.ssh\id_rsa.pub"
 }
 
 variable "resource_group_name" {
