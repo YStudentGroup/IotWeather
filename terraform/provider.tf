@@ -5,13 +5,7 @@ terraform {
       version = "~> 3.113"
     }
   }
-  backend "azurerm" {
-    resource_group_name  = "Seb-RG"
-    storage_account_name = "sebterraformstorage"
-    container_name       = "tfstate"
-    key                  = "terraform.tfstate"
-    access_key           = var.backend_access_key
-  }
+
 }
 
 provider "azurerm" {

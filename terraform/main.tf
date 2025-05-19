@@ -1,23 +1,18 @@
 terraform {
-  required_version = ">= 1.4.0"
-
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
-    }
+  required_version = ">= 1.4.0"  
   }
-}
-
-provider "azurerm" {
-  features {}
-}
 
 # Lecture de la clé SSH publique
 data "local_file" "ssh_key" {
   filename = var.ssh_public_key_path
 }
-
+backend "azurerm" {
+    resource_group_name  = "Seb-RG"
+    storage_account_name = "sebterraformstorage"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+    access_key           = var.backend_access_key
+}
 
 # Groupe de ressources
 resource "azurerm_resource_group" "main" {
