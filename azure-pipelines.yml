@@ -8,6 +8,7 @@ jobs:
   - checkout: self
 
   - script: |
+      cd terraform
       echo "resource_group_name  = \"Seb-RG\"" > backend.config
       echo "storage_account_name = \"sebterraformstorage\"" >> backend.config
       echo "container_name       = \"tfstate\"" >> backend.config
@@ -23,6 +24,7 @@ jobs:
       ARM_TENANT_ID: $(ARM_TENANT_ID)
 
   - script: |
+      cd terraform
       terraform plan -out=tfplan
     displayName: 'Terraform Plan'
     env:
@@ -32,6 +34,7 @@ jobs:
       ARM_TENANT_ID: $(ARM_TENANT_ID)
 
   - script: |
+      cd terraform
       terraform apply -auto-approve tfplan
     displayName: 'Terraform Apply'
     env:
