@@ -1,6 +1,6 @@
 jobs:
 - job: ApplyTerraform
-  displayName: 'Terraform Plan & Apply'
+  displayName: 'Apply Terraform Configuration'
   pool:
     name: Agent-AzDevOps
 
@@ -8,37 +8,19 @@ jobs:
   - checkout: self
 
   - script: |
-      cd terraform
-      echo "resource_group_name  = \"Seb-RG\"" > backend.config
-      echo "storage_account_name = \"sebterraformstorage\"" >> backend.config
-      echo "container_name       = \"tfstate\"" >> backend.config
-      echo "key                  = \"terraform.tfstate\"" >> backend.config
-      echo "access_key           = \"$(backend_access_key)\"" >> backend.config
+      echo resource_group_name  = "Seb-RG" > backend.config
+      echo storage_account_name = "sebterraformstorage" >> backend.config
+      echo container_name       = "tfstate" >> backend.config
+      echo key                  = "terraform.tfstate" >> backend.config
+      echo access_key           = "$(backend_access_key)" >> backend.config
 
       terraform init -backend-config=backend.config
-    displayName: 'Terraform Init'
-    env:
-      ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-      ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-      ARM_TENANT_ID: $(ARM_TENANT_ID)
-
-  - script: |
-      cd terraform
       terraform plan -out=tfplan
-    displayName: 'Terraform Plan'
-    env:
-      ARM_CLIENT_ID: $(ARM_CLIENT_ID)
-      ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
-      ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
-      ARM_TENANT_ID: $(ARM_TENANT_ID)
-
-  - script: |
-      cd terraform
       terraform apply -auto-approve tfplan
-    displayName: 'Terraform Apply'
+    displayName: 'Terraform Init, Plan & Apply'
     env:
       ARM_CLIENT_ID: $(ARM_CLIENT_ID)
       ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
       ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
       ARM_TENANT_ID: $(ARM_TENANT_ID)
+      TF_VAR_backend_access_key: $(backend_access_key)
