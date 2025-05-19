@@ -1,57 +1,9 @@
-trigger:
-- main
-
-pool:
-  name: Agent-AzDevOps   # ou le nom du pool où ton agent est enregistré
-  demands: []
-
-variables:
-  vmUser: azureuser
-  sshKey: $(SSH_PRIVATE_KEY)  # à stocker dans Azure DevOps Pipeline > Variables (secret)
-  repoURL: https://github.com/YStudentGroup/IotWeather.git
-
-stages:
-- stage: Terraform
-  jobs:
-  - job: ApplyTerraform
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.x'
-
-    - task: Bash@3
-      displayName: "Install Terraform"
-      inputs:
-        script: |
-          curl -sL https://apt.releases.hashicorp.com/gpg | gpg --dearmor > hashicorp.gpg
-          sudo install -o root -g root -m 644 hashicorp.gpg /etc/apt/trusted.gpg.d/
-          sudo apt-add-repository --yes https://apt.releases.hashicorp.com
-          sudo apt-get update && sudo apt-get install terraform -y
-
-    - script: |
-        cd terraform
-        terraform init
-        terraform apply -auto-approve
-      displayName: 'Terraform apply'
-
-- stage: DeployAPI
-  dependsOn: Terraform
-  jobs:
-  - job: SSHDeploy
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - script: |
-        echo "$sshKey" > id_rsa
-        chmod 600 id_rsa
-
-        # Récupérer l'IP publique générée par Terraform
-        vm_ip=$(terraform -chdir=terraform output -raw vm_ip)
-
-        echo "Deploying API to $vm_ip..."
-
-        scp -o StrictHostKeyChecking=no -i id_rsa deploy/deploy-api.sh $(vmUser)@$vm_ip:/home/$(vmUser)/
-        ssh -o StrictHostKeyChecking=no -i id_rsa $(vmUser)@$vm_ip 'bash deploy-api.sh'
-      displayName: "Deploy API via SSH"
+jobs:
+- job: ApplyTerraform
+  pool:
+    name: Agent-AzDevOps
+  steps:
+  - script: |
+      terraform init
+      terraform apply -auto-approve
+    displayName: 'Apply Terraform'
