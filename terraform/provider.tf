@@ -1,4 +1,4 @@
-Configuration des providers requis pour le projet,
+
 terraform {
   required_providers { 
     azurerm    = {
