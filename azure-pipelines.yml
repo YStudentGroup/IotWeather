@@ -1,6 +1,10 @@
 trigger:
 - main
 
+pool:
+  name: Agent-AzDevOps   # ou le nom du pool où ton agent est enregistré
+  demands: []
+
 variables:
   vmUser: azureuser
   sshKey: $(SSH_PRIVATE_KEY)  # à stocker dans Azure DevOps Pipeline > Variables (secret)
