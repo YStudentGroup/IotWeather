@@ -6,6 +6,8 @@ jobs:
   - script: |
       cd terraform
       dir
+      echo %PATH%
+      az version
       terraform init
       terraform apply -auto-approve
     displayName: 'Apply Terraform'
