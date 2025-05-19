@@ -87,7 +87,6 @@ def send_weather_to_api(api_url):
         try:
             response = requests.post(api_url, json=data)
             if response.status_code >= 200 and response.status_code < 300:
-                print(data)
                 print(f"[{datetime.now()}] Données envoyées avec succès.")
             else:
                 print(f"[{datetime.now()}] Erreur {response.status_code} lors de l'envoi.")
