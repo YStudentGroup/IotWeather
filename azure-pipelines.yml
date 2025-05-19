@@ -4,8 +4,8 @@ jobs:
     name: Agent-AzDevOps
   steps:
   - script: |
+      cd terraform
       dir
       terraform init
       terraform apply -auto-approve
     displayName: 'Apply Terraform'
-    workingDirectory: $(System.DefaultWorkingDirectory)/terraform
