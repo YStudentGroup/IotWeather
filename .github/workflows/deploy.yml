@@ -87,9 +87,10 @@ jobs:
           chmod 600 temp-ssh-key.pem
 
       - name: Upload files to VM
+        working-directory: ${{ github.workspace }}
         run: |
+          ls
           echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
           chmod 600 temp-ssh-key.pem
           echo "Uploading to IP: $VM_IP"
           scp -o StrictHostKeyChecking=no -i temp-ssh-key.pem -r tests SimulateData.py requirements.txt ubuntu@$VM_IP:/home/ubuntu/
-
