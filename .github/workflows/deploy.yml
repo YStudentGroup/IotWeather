@@ -20,15 +20,6 @@ jobs:
       - name: Create terraform directory (in case it doesn't exist)
         run: mkdir -p .
 
-<<<<<<< HEAD
-=======
-      - name: Restore Terraform state from cache
-        uses: actions/cache@v3
-        with:
-          path: terraform/terraform.tfstate
-          key: terraform-state-${{ github.ref }}
-
->>>>>>> 77f8570c9a6961376ae7efb876e1b7ee1273fb8e
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -53,15 +44,6 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -var-file=terraform.tfvars -auto-approve
 
-<<<<<<< HEAD
-=======
-      - name: Save Terraform state to cache
-        uses: actions/cache@v3
-        with:
-          path: terraform/terraform.tfstate
-          key: terraform-state-${{ github.ref }}
-
->>>>>>> 77f8570c9a6961376ae7efb876e1b7ee1273fb8e
       - name: Output public IP
         run: terraform output -raw public_ip
 
@@ -82,10 +64,6 @@ jobs:
         run: |
           echo "public_ssh_key = \"${SSH_PUBLIC_KEY}\"" > temp-auto.tfvars
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 77f8570c9a6961376ae7efb876e1b7ee1273fb8e
       - name: Re-apply Terraform with public key
         run: terraform apply -var-file=terraform.tfvars -var-file=temp-auto.tfvars -auto-approve
         working-directory: terraform
@@ -145,8 +123,4 @@ jobs:
             echo "Building and starting containers..."
             docker compose build
             docker compose up -d
-<<<<<<< HEAD
           EOF
-=======
-          EOF
->>>>>>> 77f8570c9a6961376ae7efb876e1b7ee1273fb8e
