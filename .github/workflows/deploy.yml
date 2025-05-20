@@ -28,14 +28,17 @@ jobs:
 
       - name: Create terraform.tfvars file
         run: |
-          echo 'admin_username = "ubuntu"' > terraform.tfvars
-          echo 'public_ssh_key = "${{ secrets.PUBLIC_SSH_KEY }}"' > terraform.tfvars
+          echo 'project_id         = "eastern-memory-460407-a3"' > terraform/terraform.tfvars
+          echo 'region             = "europe-west1"' >> terraform/terraform.tfvars
+          echo 'zone               = "europe-west1-b"' >> terraform/terraform.tfvars
+          echo 'admin_username     = "ubuntu"' >> terraform/terraform.tfvars
+          echo 'public_ssh_key_path = "~/.ssh/gcp-ci-cd-key.pub"' >> terraform/terraform.tfvars
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -var-file="terraform/terraform.tfvars" -auto-approve
+        run: terraform apply -var-file=terraform.tfvars -auto-approve
 
       - name: Output public IP
         run: terraform output -raw public_ip
