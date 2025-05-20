@@ -9,7 +9,7 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name          = "subnet-ci-cd-Test"
+  name          = "subnet-ci-cd"
   ip_cidr_range = "10.0.1.0/24"
   region        = var.region
   network       = google_compute_network.vpc_network.id
@@ -21,7 +21,7 @@ resource "google_compute_address" "public_ip" {
 }
 
 resource "google_compute_firewall" "default" {
-  name    = "allow-ssh-http-Test"
+  name    = "allow-ssh-http"
   network = google_compute_network.vpc_network.name
 
   allow {
@@ -33,7 +33,7 @@ resource "google_compute_firewall" "default" {
 }
 
 resource "google_compute_instance" "vm" {
-  name         = "ci-cd-vm-Test"
+  name         = "ci-cd-vm"
   machine_type = "e2-medium"
   zone         = var.zone
 
