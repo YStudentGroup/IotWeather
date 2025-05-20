@@ -88,5 +88,8 @@ jobs:
 
       - name: Upload files to VM
         run: |
+          echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
+          chmod 600 temp-ssh-key.pem
           echo "Uploading to IP: $VM_IP"
-          sc
+          scp -o StrictHostKeyChecking=no -i temp-ssh-key.pem -r tests SimulateData.py requirements.txt ubuntu@$VM_IP:/home/ubuntu/
+
