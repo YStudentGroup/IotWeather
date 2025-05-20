@@ -5,7 +5,7 @@ provider "google" {
 }
 
 resource "google_compute_network" "vpc_network" {
-  name = "vpc-ci-cd-unique-1234"  # change le nom
+  name = "vpc-ci-cd-unique-test"  # change le nom
   auto_create_subnetworks = false
 }
 
@@ -17,7 +17,7 @@ resource "google_compute_subnetwork" "subnet" {
 }
 
 resource "google_compute_address" "public_ip" {
-  name   = "ci-cd-ip-unique-1234"  # change le nom
+  name   = "ci-cd-ip-unique-test"  # change le nom
   region = var.region
 }
 
