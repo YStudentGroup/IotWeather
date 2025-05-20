@@ -63,22 +63,29 @@ jobs:
         id: get_ip
         run: echo "VM_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
 
-      - name: Start SSH agent and add key
+      - name: Generate SSH key
         run: |
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-          ssh-add -l  # pour vérifier que la clé est bien chargée
+          ssh-keygen -t rsa -b 4096 -f temp-ssh-key -N ""
+          echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
+          cat temp-ssh-key >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+          echo "SSH_PUBLIC_KEY=$(cat temp-ssh-key.pub)" >> $GITHUB_ENV
 
-      - name: Wait for VM to be ready
+      - name: Inject SSH public key in VM with Terraform
         run: |
-          echo "Waiting 30s for SSH service..."
-          sleep 30
+          echo "public_ssh_key = \"${SSH_PUBLIC_KEY}\"" > terraform/temp-auto.tfvars
+        working-directory: terraform
+
+      - name: Re-apply Terraform with public key
+        run: terraform apply -var-file=terraform.tfvars -var-file=temp-auto.tfvars -auto-approve
+        working-directory: terraform
+
+      - name: Save private key to file
+        run: |
+          echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
+          chmod 600 temp-ssh-key.pem
 
       - name: Upload files to VM
         run: |
-          ls -la
-          scp -o StrictHostKeyChecking=no -r tests SimulateData.py requirements.txt ubuntu@$VM_IP:/home/ubuntu/
-        working-directory: ${{ github.workspace }}
-
-      - name: Afficher les clés SSH chargées
-        run: ssh-add -l
+          echo "Uploading to IP: $VM_IP"
+          sc
