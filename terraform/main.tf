@@ -52,7 +52,9 @@ resource "google_compute_instance" "vm" {
     }
   }
 
-  metadata_startup_script = file("init.sh") # Installation automatique (Node.js, Git, PM2...)
+  metadata = {
+  ssh-keys = "${var.admin_username}:${file(var.public_ssh_key_path)}"
+  }
 
   tags = ["http-server", "https-server"]
 
