@@ -20,10 +20,6 @@ variable "admin_username" {
   type        = string
 }
 
-variable "public_ssh_key_path" {
-  description = "Path to the public SSH key"
-  type        = string
-}
 variable "public_ssh_key" {
   description = "SSH public key string"
   type        = string
