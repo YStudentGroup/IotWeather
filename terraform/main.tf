@@ -10,10 +10,10 @@ resource "google_compute_network" "vpc_network" {
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name          = "subnet-ci-cd"
-  ip_cidr_range = "10.0.1.0/24"
+  name          = "subnet-ci-cd-v2" # <- nom différent
   region        = var.region
   network       = google_compute_network.vpc_network.id
+  ip_cidr_range = "10.0.0.0/24"
 }
 
 resource "google_compute_address" "public_ip" {
@@ -22,12 +22,12 @@ resource "google_compute_address" "public_ip" {
 }
 
 resource "google_compute_firewall" "default" {
-  name    = "allow-ssh-http"
-  network = google_compute_network.vpc_network.name
+  name    = "allow-ssh-http-v2" # <- nom différent
+  network = google_compute_network.vpc_network.id
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "80", "443"]
+    ports    = ["22", "80"]
   }
 
   source_ranges = ["0.0.0.0/0"]
