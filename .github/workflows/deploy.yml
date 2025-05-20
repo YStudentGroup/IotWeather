@@ -59,21 +59,18 @@ jobs:
       - name: Output public IP
         run: terraform output -raw public_ip
 
-      - name: Create SSH key file
+      - name: Start SSH agent and add key
         run: |
-          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > terraform/gcp-key.pem
-          chmod 600 terraform/gcp-key.pem
-
-      - name: Get VM IP
-        run: echo "VM_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
-        working-directory: terraform
+          eval "$(ssh-agent -s)"
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
+          ssh-add -l
 
       - name: Wait for VM to be ready
         run: |
           echo "Waiting 30s for SSH service..."
-          sleep 5
+          sleep 30
 
       - name: Upload files to VM
         run: |
-          scp -o StrictHostKeyChecking=no -i terraform/gcp-key.pem -r tests SimulateData.py requirements.txt ubuntu@${{ env.VM_IP }}:/home/ubuntu/
+          scp -o StrictHostKeyChecking=no -r tests SimulateData.py requirements.txt ubuntu@${{ env.VM_IP }}:/home/ubuntu/
         working-directory: .
