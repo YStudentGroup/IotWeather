@@ -1,6 +1,6 @@
 # Dockerfile
 
-FROM python:3.10-slim
+FROM python:latest
 
 WORKDIR /app
 
