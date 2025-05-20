@@ -59,6 +59,10 @@ jobs:
       - name: Output public IP
         run: terraform output -raw public_ip
 
+      - name: Get VM IP
+        id: get_ip
+        run: echo "VM_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+
       - name: Start SSH agent and add key
         run: |
           eval "$(ssh-agent -s)"
@@ -72,5 +76,6 @@ jobs:
 
       - name: Upload files to VM
         run: |
-          scp -o StrictHostKeyChecking=no -r tests SimulateData.py requirements.txt ubuntu@${{ env.VM_IP }}:/home/ubuntu/
+          echo "Uploading to IP: $VM_IP"
+          scp -o StrictHostKeyChecking=no -r tests SimulateData.py requirements.txt ubuntu@$VM_IP:/home/ubuntu/
         working-directory: .
