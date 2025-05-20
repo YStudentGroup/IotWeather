@@ -61,12 +61,12 @@ jobs:
 
       - name: Create SSH key file
         run: |
-          mkdir -p terraform
           echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > terraform/gcp-key.pem
           chmod 600 terraform/gcp-key.pem
 
       - name: Get VM IP
         run: echo "VM_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+        working-directory: terraform
 
       - name: Wait for VM to be ready
         run: |
