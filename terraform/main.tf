@@ -52,9 +52,9 @@ resource "google_compute_instance" "vm" {
     }
   }
 
-  metadata = {
+metadata = {
   ssh-keys = "${var.admin_username}:${var.public_ssh_key}"
-  }
+}
 
   tags = ["http-server", "https-server"]
 
