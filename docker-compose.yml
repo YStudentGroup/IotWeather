@@ -1,0 +1,7 @@
+services:
+  simulator:
+    build: .
+    container_name: iot_simulator
+    volumes:
+      - .:/app
+    restart: unless-stopped

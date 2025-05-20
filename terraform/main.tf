@@ -1,101 +1,67 @@
-terraform {
-  required_version = ">= 1.4.0"
+provider "google" {
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
+}
 
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+resource "google_compute_network" "vpc_network" {
+  name = "vpc-ci-cd-unique-test"  # change le nom
+  auto_create_subnetworks = false
+}
+
+resource "google_compute_subnetwork" "subnet" {
+  name          = "subnet-ci-cd-v2" # <- nom différent
+  region        = var.region
+  network       = google_compute_network.vpc_network.id
+  ip_cidr_range = "10.0.0.0/24"
+}
+
+resource "google_compute_address" "public_ip" {
+  name   = "ci-cd-ip-unique-test"  # change le nom
+  region = var.region
+}
+
+resource "google_compute_firewall" "default" {
+  name    = "allow-ssh-http-v2" # <- nom différent
+  network = google_compute_network.vpc_network.id
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22", "80"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+
+resource "google_compute_instance" "vm" {
+  name         = "ci-cd-vm"
+  machine_type = "e2-medium"
+  zone         = var.zone
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2004-lts"
     }
   }
-}
 
-provider "azurerm" {
-  features {}
-}
+  network_interface {
+    network    = google_compute_network.vpc_network.id
+    subnetwork = google_compute_subnetwork.subnet.id
 
-# Lecture de la clé SSH publique
-data "local_file" "ssh_key" {
-  filename = var.ssh_public_key_path
-}
-
-
-# Groupe de ressources
-resource "azurerm_resource_group" "main" {
-  name     = var.resource_group_name
-  location = var.location
-}
-
-# Réseau virtuel
-resource "azurerm_virtual_network" "main" {
-  name                = "vnet-ci-cd"
-  address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-}
-
-# Sous-réseau
-resource "azurerm_subnet" "main" {
-  name                 = "subnet-ci-cd-Seb"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
-
-# IP publique
-resource "azurerm_public_ip" "main" {
-  name                = "public-ip"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  allocation_method   = "Static"
-  sku                 = "Basic"
-}
-
-# Interface réseau
-resource "azurerm_network_interface" "main" {
-  name                = "nic-ci-cd"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.main.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.main.id
-  }
-}
-
-# Machine virtuelle Linux
-resource "azurerm_linux_virtual_machine" "main" {
-  name                = "vm-ci-cd"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  size                = "Standard_B1s"
-  admin_username      = var.admin_username
-  network_interface_ids = [
-    azurerm_network_interface.main.id,
-  ]
-
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = data.local_file.ssh_key.content
+    access_config {
+      nat_ip = google_compute_address.public_ip.address
+    }
   }
 
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-    name                 = "osdisk-ci-cd"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "20_04-lts"
-    version   = "latest"
-  }
+metadata = {
+  ssh-keys = "${var.admin_username}:${var.public_ssh_key}"
 }
 
-# Output : IP publique
+  tags = ["http-server", "https-server"]
+
+  
+}
+
 output "public_ip" {
-  value = azurerm_public_ip.main.ip_address
-  description = "Adresse IP publique de la VM"
+  value = google_compute_address.public_ip.address
 }
