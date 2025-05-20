@@ -5,23 +5,23 @@ provider "google" {
 }
 
 resource "google_compute_network" "vpc_network" {
-  name = "vpc-ci-cd"
+  name = "vpc-ci-cd-Test"
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  name          = "subnet-ci-cd"
+  name          = "subnet-ci-cd-Test"
   ip_cidr_range = "10.0.1.0/24"
   region        = var.region
   network       = google_compute_network.vpc_network.id
 }
 
 resource "google_compute_address" "public_ip" {
-  name   = "ci-cd-ip"
+  name   = "ci-cd-ip-Test"
   region = var.region
 }
 
 resource "google_compute_firewall" "default" {
-  name    = "allow-ssh-http"
+  name    = "allow-ssh-http-Test"
   network = google_compute_network.vpc_network.name
 
   allow {
@@ -33,7 +33,7 @@ resource "google_compute_firewall" "default" {
 }
 
 resource "google_compute_instance" "vm" {
-  name         = "ci-cd-vm"
+  name         = "ci-cd-vm-Test"
   machine_type = "e2-medium"
   zone         = var.zone
 
