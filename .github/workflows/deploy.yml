@@ -9,10 +9,6 @@ jobs:
   terraform-and-deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: terraform
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,9 +25,9 @@ jobs:
 
       - name: Create terraform.tfvars file
         run: |
-          echo 'admin_username = "ubuntu"' >> terraform/terraform.tfvars
-          echo 'public_ssh_key = "${{ secrets.PUBLIC_SSH_KEY }}"' >> terraform/terraform.tfvars
-        
+          echo 'admin_username = "ubuntu"' >> terraform.tfvars
+          echo 'public_ssh_key = "${{ secrets.PUBLIC_SSH_KEY }}"' >> terraform.tfvars
+
       - name: Terraform Init
         run: terraform init
 
