@@ -67,7 +67,7 @@ jobs:
         run: |
           eval "$(ssh-agent -s)"
           echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" | tr -d '\r' | ssh-add -
-          ssh-add -l
+          ssh-add -l  # pour vérifier que la clé est bien chargée
 
       - name: Wait for VM to be ready
         run: |
@@ -76,6 +76,6 @@ jobs:
 
       - name: Upload files to VM
         run: |
-          echo "Uploading to IP: $VM_IP"
           scp -o StrictHostKeyChecking=no -r tests SimulateData.py requirements.txt ubuntu@$VM_IP:/home/ubuntu/
-        working-directory: .
+      - name: Afficher les clés SSH chargées
+        run: ssh-add -l
