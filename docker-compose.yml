@@ -1,11 +1,11 @@
-version: "3.8"
+# docker-compose.yml
+
+version: '3.8'
 
 services:
-  iotweather:
+  simulator:
     build: .
-    container_name: iotweather-simulator
-    restart: unless-stopped
-    environment:
-      - PYTHONUNBUFFERED=1
+    container_name: iot_simulator
     volumes:
       - .:/app
+    restart: unless-stopped

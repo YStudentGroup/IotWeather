@@ -122,3 +122,18 @@ jobs:
             fi
           EOF
 
+      - name: Build and run Docker Compose on VM
+        run: |
+          echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
+          chmod 600 temp-ssh-key.pem
+          ssh -o StrictHostKeyChecking=no -i temp-ssh-key.pem ubuntu@$VM_IP << EOF
+            cd /home/ubuntu
+            if ! command -v docker-compose &> /dev/null; then
+              echo "docker-compose not found, attempting fallback install..."
+              sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              sudo chmod +x /usr/local/bin/docker-compose
+            fi
+            echo "Building and starting containers..."
+            docker compose build
+            docker compose up -d
+          EOF
