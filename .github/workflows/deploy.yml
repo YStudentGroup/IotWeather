@@ -28,8 +28,8 @@ jobs:
 
       - name: Create terraform.tfvars file
         run: |
-          echo 'admin_username = "ubuntu"' >> terraform.tfvars
-          echo 'public_ssh_key = "${{ secrets.PUBLIC_SSH_KEY }}"' >> terraform.tfvars
+          echo 'admin_username = "ubuntu"' > terraform.tfvars
+          echo 'public_ssh_key = "${{ secrets.PUBLIC_SSH_KEY }}"' > terraform.tfvars
 
       - name: Terraform Init
         run: terraform init
