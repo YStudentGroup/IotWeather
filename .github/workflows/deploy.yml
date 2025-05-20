@@ -34,4 +34,4 @@ jobs:
         run: terraform apply -auto-approve
 
       - name: Output public IP
-        run: terraform output -raw instance_ip
+        run: terraform output -raw public_ip
