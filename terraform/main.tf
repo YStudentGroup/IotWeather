@@ -1,96 +1,66 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.113"
+provider "google" {
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
+}
+
+resource "google_compute_network" "vpc_network" {
+  name = "vpc-ci-cd"
+}
+
+resource "google_compute_subnetwork" "subnet" {
+  name          = "subnet-ci-cd"
+  ip_cidr_range = "10.0.1.0/24"
+  region        = var.region
+  network       = google_compute_network.vpc_network.id
+}
+
+resource "google_compute_address" "public_ip" {
+  name   = "ci-cd-ip"
+  region = var.region
+}
+
+resource "google_compute_firewall" "default" {
+  name    = "allow-ssh-http"
+  network = google_compute_network.vpc_network.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22", "80", "443"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+
+resource "google_compute_instance" "vm" {
+  name         = "ci-cd-vm"
+  machine_type = "e2-medium"
+  zone         = var.zone
+
+  boot_disk {
+    initialize_params {
+      image = "ubuntu-os-cloud/ubuntu-2004-lts"
     }
   }
 
-  backend "azurerm" {
-    resource_group_name  = "Seb-RG"
-    storage_account_name = "sebterraformstorage"
-    container_name       = "tfstate"
-    key                  = "terraform.tfstate"
-    access_key           = var.backend_access_key
-}
-}
-# Groupe de ressources
-resource "azurerm_resource_group" "main" {
-  name     = var.resource_group_name
-  location = var.location
-}
+  network_interface {
+    network    = google_compute_network.vpc_network.id
+    subnetwork = google_compute_subnetwork.subnet.id
 
-# Réseau virtuel
-resource "azurerm_virtual_network" "main" {
-  name                = "vnet-ci-cd"
-  address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-}
+    access_config {
+      nat_ip = google_compute_address.public_ip.address
+    }
+  }
 
-# Sous-réseau
-resource "azurerm_subnet" "main" {
-  name                 = "subnet-ci-cd-Seb"
-  resource_group_name  = azurerm_resource_group.main.name
-  virtual_network_name = azurerm_virtual_network.main.name
-  address_prefixes     = ["10.0.1.0/24"]
-}
+  metadata_startup_script = file("init.sh") # Installation automatique (Node.js, Git, PM2...)
 
-# IP publique
-resource "azurerm_public_ip" "main" {
-  name                = "public-ip"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  allocation_method   = "Static"
-  sku                 = "Basic"
-}
+  tags = ["http-server", "https-server"]
 
-# Interface réseau
-resource "azurerm_network_interface" "main" {
-  name                = "nic-ci-cd"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.main.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.main.id
+  metadata = {
+    ssh-keys = "${var.admin_username}:${file(var.public_ssh_key_path)}"
   }
 }
 
-# Machine virtuelle Linux
-resource "azurerm_linux_virtual_machine" "main" {
-  name                = "vm-ci-cd"
-  resource_group_name = azurerm_resource_group.main.name
-  location            = azurerm_resource_group.main.location
-  size                = "Standard_B1s"
-  admin_username      = var.admin_username
-  network_interface_ids = [
-    azurerm_network_interface.main.id,
-  ]
-
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = data.local_file.ssh_key.content
-  }
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-    name                 = "osdisk-ci-cd"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "20_04-lts"
-    version   = "latest"
-  }
-}
-
-# Output : IP publique
 output "public_ip" {
-  value = azurerm_public_ip.main.ip_address
-  description = "Adresse IP publique de la VM"
+  value = google_compute_address.public_ip.address
 }
