@@ -1,13 +1,26 @@
-variable "project_id" {}
+variable "project_id" {
+  description = "GCP project ID"
+  type        = string
+}
+
 variable "region" {
-  default = "europe-west1"
+  description = "GCP region"
+  type        = string
+  default     = "europe-west1"
 }
+
 variable "zone" {
-  default = "europe-west1-b"
+  description = "GCP zone"
+  type        = string
+  default     = "europe-west1-b"
 }
+
 variable "admin_username" {
-  default = "debian"
+  description = "Username for SSH access"
+  type        = string
 }
+
 variable "public_ssh_key_path" {
-  default = "~/.ssh/id_rsa.pub"
+  description = "Path to the public SSH key file"
+  type        = string
 }
