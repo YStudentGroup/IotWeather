@@ -11,7 +11,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: terraform  # Exécuter dans ce dossier
+        working-directory: terraform  # Exécuter dans dossier
 
     steps:
       - name: Checkout code
