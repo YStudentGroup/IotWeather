@@ -76,6 +76,9 @@ jobs:
 
       - name: Upload files to VM
         run: |
+          ls -la
           scp -o StrictHostKeyChecking=no -r tests SimulateData.py requirements.txt ubuntu@$VM_IP:/home/ubuntu/
+        working-directory: ${{ github.workspace }}
+
       - name: Afficher les clés SSH chargées
         run: ssh-add -l
