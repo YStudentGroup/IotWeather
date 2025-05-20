@@ -59,16 +59,10 @@ jobs:
       - name: Output public IP
         run: terraform output -raw public_ip
 
-
-      - name: DEBUG - Affiche le début de la clé privée (masqué)
-        run: |
-          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" | head -n 5 | sed 's/./*/g'
-
       - name: Create SSH key file
         run: |
-          cd ..
-          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > gcp-key.pem
-          chmod 600 gcp-key.pem
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > terraform/gcp-key.pem
+          chmod 600 terraform/gcp-key.pem
 
       - name: Get VM IP
         run: echo "VM_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
@@ -80,7 +74,5 @@ jobs:
 
       - name: Upload files to VM
         run: |
-          scp -o StrictHostKeyChecking=no -i gcp-key.pem \
-            SimulateData.py requirements.txt -r tests \
-            ubuntu@${{ env.VM_IP }}:/home/ubuntu/
-        working-directory: ./
+          scp -o StrictHostKeyChecking=no -i ../gcp-key.pem -r tests SimulateData.py requirements.txt ubuntu@${{ env.VM_IP }}:/home/ubuntu/
+          working-directory: ./terraform
