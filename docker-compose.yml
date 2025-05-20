@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  iotweather:
+    build: .
+    container_name: iotweather-simulator
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
