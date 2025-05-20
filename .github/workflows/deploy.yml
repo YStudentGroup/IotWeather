@@ -72,9 +72,10 @@ jobs:
           echo "SSH_PUBLIC_KEY=$(cat temp-ssh-key.pub)" >> $GITHUB_ENV
 
       - name: Inject SSH public key in VM with Terraform
-        run: |
-          echo "public_ssh_key = \"${SSH_PUBLIC_KEY}\"" > terraform/temp-auto.tfvars
         working-directory: terraform
+        run: |
+          echo "public_ssh_key = \"${SSH_PUBLIC_KEY}\"" > temp-auto.tfvars
+
 
       - name: Re-apply Terraform with public key
         run: terraform apply -var-file=terraform.tfvars -var-file=temp-auto.tfvars -auto-approve
