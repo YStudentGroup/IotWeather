@@ -27,6 +27,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Create terraform.tfvars file
+        run: |
+          echo 'admin_username = "ubuntu"' >> terraform/terraform.tfvars
+          echo 'public_ssh_key = "${{ secrets.PUBLIC_SSH_KEY }}"' >> terraform/terraform.tfvars
+        
       - name: Terraform Init
         run: terraform init
 
