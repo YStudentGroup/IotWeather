@@ -61,6 +61,7 @@ jobs:
 
       - name: Create SSH key file
         run: |
+          mkdir -p terraform
           echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > terraform/gcp-key.pem
           chmod 600 terraform/gcp-key.pem
 
@@ -75,4 +76,4 @@ jobs:
       - name: Upload files to VM
         run: |
           scp -o StrictHostKeyChecking=no -i ../gcp-key.pem -r tests SimulateData.py requirements.txt ubuntu@${{ env.VM_IP }}:/home/ubuntu/
-          working-directory: ./terraform
+          working-directory: .
