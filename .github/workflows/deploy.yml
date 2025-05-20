@@ -59,14 +59,13 @@ jobs:
       - name: Output public IP
         run: terraform output -raw public_ip
 
-        
+
       - name: Create SSH key file
         run: |
-          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > ../gcp-key.pem
-          chmod 600 ../gcp-key.pem
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > gcp-key.pem
+          chmod 600 gcp-key.pem
 
       - name: Get VM IP
-        id: vm_ip
         run: echo "VM_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
 
       - name: Wait for VM to be ready
@@ -76,7 +75,7 @@ jobs:
 
       - name: Upload files to VM
         run: |
-          scp -o StrictHostKeyChecking=no -i ../gcp-key.pem \
+          scp -o StrictHostKeyChecking=no -i gcp-key.pem \
             SimulateData.py requirements.txt -r tests \
             ubuntu@${{ env.VM_IP }}:/home/ubuntu/
         working-directory: ./
