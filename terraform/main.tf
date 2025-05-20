@@ -1,3 +1,9 @@
+terraform {
+  backend "gcs" {
+    bucket  = "terraform-state-iotweather"
+    prefix  = "vm/iotweather"
+  }
+}
 provider "google" {
   project = var.project_id
   region  = var.region
