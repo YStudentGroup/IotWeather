@@ -5,7 +5,7 @@ provider "google" {
 }
 
 resource "google_compute_network" "vpc_network" {
-  name = "vpc-ci-cd-Test"
+  name = "vpc-ci-cd"
 }
 
 resource "google_compute_subnetwork" "subnet" {
@@ -16,7 +16,7 @@ resource "google_compute_subnetwork" "subnet" {
 }
 
 resource "google_compute_address" "public_ip" {
-  name   = "ci-cd-ip-Test"
+  name   = "ci-cd-ip"
   region = var.region
 }
 
