@@ -1,3 +1,9 @@
+name: Deploy Infrastructure + App to GCP
+
+on:
+  push:
+    branches:
+      - main
 jobs:
   terraform-and-deploy:
     runs-on: ubuntu-latest
