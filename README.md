@@ -10,7 +10,7 @@ Avant d'exécuter l'application, assurez-vous d'avoir les éléments suivants in
 - **Python** : Vous pouvez télécharger la dernière version de Python [ici](https://www.python.org/downloads/).
 - **pip** : Gestionnaire de paquets Python, généralement inclus avec Python.
 
-## Installation 
+## Installation
 
 ### 1. Installer Python
 - Allez sur le site officiel de Python : [https://www.python.org/downloads/](https://www.python.org/downloads/)
