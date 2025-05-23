@@ -96,5 +96,5 @@ def send_weather_to_api(api_url):
         time.sleep(10)
 
 if __name__ == "__main__":
-    API_URL = "http://127.0.0.1:3001/api/weather"
+    API_URL = "http://weather-api:3001/api/weather"
     send_weather_to_api(API_URL)
