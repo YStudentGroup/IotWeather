@@ -12,12 +12,19 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /home/ubuntu/Back/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
     ports:
       - "9090:9090"
-    restart: unless-stopped
     networks:
       - weather_net
+
+volumes:
+  prometheus_data:
+
+networks:
+  weather_net:
+    external: true
 
   grafana:
     image: grafana/grafana:latest
