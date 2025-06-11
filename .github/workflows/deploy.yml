@@ -109,7 +109,7 @@ jobs:
             fi
           EOF
 
-      - name: Build and run Docker Compose on VM
+      - name: Build and run Docker Compose
         run: |
           echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
           chmod 600 temp-ssh-key.pem
