@@ -81,7 +81,12 @@ jobs:
           chmod 600 temp-ssh-key.pem
           echo "Uploading to IP: $VM_IP"
           sudo mkdir -p /home/ubuntu/Back/monitoring
-          sudo su
+          
+          # Permet à ubuntu d’y écrire
+          sudo chown -R ubuntu $(id -gn ubuntu) /home/ubuntu/Back/monitoring
+          
+          # Donne les droits de lecture/exécution (essentiel pour écrire dans le dossier)
+          sudo chmod -R u+rX /home/ubuntu/Back/monitoring
           scp -o StrictHostKeyChecking=no -i temp-ssh-key.pem -r tests SimulateData.py requirements.txt Dockerfile docker-compose.yml monitoring ubuntu@$VM_IP:/home/ubuntu/Back
 
       - name: Check and install Docker on VM
