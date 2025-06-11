@@ -80,7 +80,7 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
           chmod 600 temp-ssh-key.pem
           echo "Uploading to IP: $VM_IP"
-          scp -o StrictHostKeyChecking=no -i temp-ssh-key.pem -r tests SimulateData.py requirements.txt Dockerfile docker-compose.yml ubuntu@$VM_IP:/home/ubuntu/Back
+          scp -o StrictHostKeyChecking=no -i temp-ssh-key.pem -r tests SimulateData.py requirements.txt Dockerfile docker-compose.yml monitoring ubuntu@$VM_IP:/home/ubuntu/Back
 
       - name: Check and install Docker on VM
         run: |
