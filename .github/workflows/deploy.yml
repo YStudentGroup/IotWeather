@@ -81,7 +81,7 @@ jobs:
           chmod 600 temp-ssh-key.pem
           echo "Uploading to IP: $VM_IP"
           sudo mkdir -p /home/ubuntu/Back/monitoring
-          sudo chown -R ubuntu /home/ubuntu/Back/monitoring
+          sudo su
           scp -o StrictHostKeyChecking=no -i temp-ssh-key.pem -r tests SimulateData.py requirements.txt Dockerfile docker-compose.yml monitoring ubuntu@$VM_IP:/home/ubuntu/Back
 
       - name: Check and install Docker on VM
