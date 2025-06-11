@@ -54,7 +54,7 @@ jobs:
       - name: Generate SSH key
         run: |
           ssh-keygen -t rsa -b 4096 -f temp-ssh-key -N ""
-          echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
+          echo "GCP_SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
           cat temp-ssh-key >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           echo "SSH_PUBLIC_KEY=$(cat temp-ssh-key.pub)" >> $GITHUB_ENV
@@ -64,25 +64,15 @@ jobs:
         run: |
           echo "public_ssh_key = \"${SSH_PUBLIC_KEY}\"" > temp-auto.tfvars
 
-
-      - name: Save private key to file
-        run: |
-          echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
-          chmod 600 temp-ssh-key.pem
-
       - name: Upload files to VM
         working-directory: ${{ github.workspace }}
         run: |
           ls
-          echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
-          chmod 600 temp-ssh-key.pem
           echo "Uploading to IP: $VM_IP"
           scp -o StrictHostKeyChecking=no -i temp-ssh-key.pem -r tests SimulateData.py requirements.txt Dockerfile docker-compose.yml monitoring ubuntu@$VM_IP:/home/ubuntu/Back
 
       - name: Check and install Docker on VM
         run: |
-          echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
-          chmod 600 temp-ssh-key.pem
           echo "Checking/Installing Docker on $VM_IP..."
           ssh -o StrictHostKeyChecking=no -i temp-ssh-key.pem ubuntu@$VM_IP << EOF
             if ! command -v docker &> /dev/null
@@ -108,8 +98,6 @@ jobs:
 
       - name: Build and run Docker Compose
         run: |
-          echo "$SSH_PRIVATE_KEY" > temp-ssh-key.pem
-          chmod 600 temp-ssh-key.pem
           ssh -o StrictHostKeyChecking=no -i temp-ssh-key.pem ubuntu@$VM_IP << EOF
             cd /home/ubuntu/Back
             if ! command -v docker-compose &> /dev/null; then
