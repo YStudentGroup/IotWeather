@@ -9,18 +9,19 @@ jobs:
   terraform-and-deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: terraform
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Generate SSH key
+      - name: Save SSH private key from secret
         run: |
-          ssh-keygen -t rsa -b 4096 -f temp-ssh-key -N ""
-          echo "SSH_PUBLIC_KEY=$(cat temp-ssh-key.pub)" >> $GITHUB_ENV
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > id_rsa
+          chmod 600 id_rsa
+          echo "SSH_PRIVATE_KEY_PATH=$PWD/id_rsa" >> $GITHUB_ENV
+
+      - name: Save SSH public key from secret
+        run: |
+          echo "SSH_PUBLIC_KEY=${{ secrets.PUBLIC_SSH_KEY }}" >> $GITHUB_ENV
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -33,6 +34,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Create terraform.tfvars file
+        working-directory: terraform
         run: |
           echo 'project_id         = "eastern-memory-460407-a3"' > terraform.tfvars
           echo 'region             = "europe-west1"' >> terraform.tfvars
@@ -41,25 +43,29 @@ jobs:
           echo "public_ssh_key     = \"${SSH_PUBLIC_KEY}\"" >> terraform.tfvars
 
       - name: Terraform Init
+        working-directory: terraform
         run: terraform init
 
       - name: Terraform Apply
+        working-directory: terraform
         run: terraform apply -var-file=terraform.tfvars -auto-approve
 
       - name: Get VM IP
         id: get_ip
+        working-directory: terraform
         run: echo "VM_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
 
       - name: Upload files to VM
-        working-directory: ${{ github.workspace }}
         run: |
           echo "Uploading to IP: $VM_IP"
-          scp -o StrictHostKeyChecking=no -i temp-ssh-key -r tests SimulateData.py requirements.txt Dockerfile docker-compose.yml monitoring ubuntu@$VM_IP:/home/ubuntu/Back
+          scp -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH -r \
+            tests SimulateData.py requirements.txt Dockerfile docker-compose.yml monitoring \
+            ubuntu@$VM_IP:/home/ubuntu/Back
 
       - name: Check and install Docker on VM
         run: |
           echo "Checking/Installing Docker on $VM_IP..."
-          ssh -o StrictHostKeyChecking=no -i temp-ssh-key ubuntu@$VM_IP << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@$VM_IP << 'EOF'
             if ! command -v docker &> /dev/null
             then
               echo "Docker not found. Installing..."
@@ -70,7 +76,7 @@ jobs:
               sudo chmod a+r /etc/apt/keyrings/docker.gpg
               echo \
                 "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-                $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+                $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | \
                 sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
               sudo apt-get update
               sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -83,17 +89,14 @@ jobs:
 
       - name: Build and run Docker Compose
         run: |
-          ssh -o StrictHostKeyChecking=no -i temp-ssh-key ubuntu@$VM_IP << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i $SSH_PRIVATE_KEY_PATH ubuntu@$VM_IP << 'EOF'
             cd /home/ubuntu/Back
             if ! command -v docker-compose &> /dev/null; then
-              echo "docker-compose not found, attempting fallback install..."
+              echo "docker-compose not found, installing manually..."
               sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
               sudo chmod +x /usr/local/bin/docker-compose
             fi
             echo "Building and starting containers..."
-            docker compose build
-            docker compose up -d
+            docker-compose build
+            docker-compose up -d
           EOF
-
-      - name: Clean up SSH keys
-        run: rm -f temp-ssh-key temp-ssh-key.pub
