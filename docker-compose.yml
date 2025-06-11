@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   simulator:
     build: .
@@ -19,26 +21,20 @@ services:
     networks:
       - weather_net
 
-volumes:
-  prometheus_data:
-
-networks:
-  weather_net:
-    external: true
-
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
     ports:
       - "3000:3000"
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - grafana_storage:/var/lib/grafana
     restart: unless-stopped
     networks:
       - weather_net
 
 volumes:
-  grafana-storage:
+  prometheus_data:
+  grafana_storage:
 
 networks:
   weather_net:
